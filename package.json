@@ -1,22 +1,22 @@
 {
-  "name": "Sunert",
+  "name": "youth_read",
   "version": "1.0.0",
   "description": "",
-  "main": "jingxi.js",
+  "main": "Youth_Read.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Sunert/Scripts.git"
+    "url": "git+https://github.com/oniyou/actions-youth.git"
   },
   "keywords": [],
-  "author": "",
+  "author": "oniyou",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/Sunert/Scripts/issues"
+    "url": "https://github.com/oniyou/actions-youth/issues"
   },
-  "homepage": "https://github.com/Sunert/Scripts#readme",
+  "homepage": "https://github.com/oniyou/actions-youth#readme",
   "dependencies": {
     "crypto-js": "^4.0.0",
     "got": "^11.7.0",
