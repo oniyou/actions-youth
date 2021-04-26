@@ -15,7 +15,7 @@ jobs:
     if: github.event.repository.owner.id == github.event.sender.id
     env:
       YOUTH_READ: ${{ secrets.YOUTH_READ }}
-      YOUTH_ATIME：${{ secrets.YOUTH_ATIME }}
+      YOUTH_ATIME: ${{ secrets.YOUTH_ATIME }}
     steps:
       - uses: actions/checkout@v1
       - name: Use Node.js 12.x
@@ -32,4 +32,4 @@ jobs:
           node Youth_Read.js
         env:
           YOUTH_READ: ${{ secrets.YOUTH_READ }}
-          YOUTH_ATIME：${{ secrets.YOUTH_ATIME }}
+          YOUTH_ATIME: ${{ secrets.YOUTH_ATIME }}
