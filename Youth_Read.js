@@ -10,6 +10,7 @@ Github Actions使用方法见[@lxk0301](https://raw.githubusercontent.com/lxk030
 
 const $ = new Env("中青看点阅读")
 //const notify = $.isNode() ? require('./sendNotify') : '';
+
 let ReadArr = [], timebodyVal ="";
 let YouthBody = $.getdata('youth_autoread')||$.getdata("zqgetbody_body");
 let smallzq = $.getdata('youth_cut');
@@ -20,7 +21,7 @@ let artArr = [], delbody = 0;
 if (isGetbody = typeof $request !==`undefined`) {
    Getbody();
    $done()
-} 
+}
 let lastIndex = $.getdata('zqbody_index')
 if (!$.isNode() && !YouthBody == true) {
     $.log("您未获取阅读请求，请求阅读后获取")
@@ -32,15 +33,36 @@ if (!$.isNode() && !YouthBody == true) {
     ReadArr.push(YouthBody)
 } else {
     if ($.isNode()) {
-        if (process.env.YOUTH_READ && process.env.YOUTH_READ.indexOf('&') > -1) {
-            YouthBodys = process.env.YOUTH_READ.split('&');
-            console.log(`您选择的是用"&"隔开\n`)
-        } else if (process.env.YOUTH_READ && process.env.YOUTH_READ.indexOf('\n') > -1) {
-            YouthBodys = process.env.YOUTH_READ.split('\n');
-            console.log(`您选择的是用换行隔开\n`)
-        } else {
-            YouthBodys = [process.env.YOUTH_READ]
-        }
+        // read JSON object from file
+        $.fs.readFile('zq_body.json', 'utf-8', (err, data) => {
+          if (err) {
+              throw err;
+          }
+          // parse JSON object
+          let body = JSON.parse(data.toString());
+          // print JSON object
+          console.log(`parse body success~~~~~~`);
+          if(body.youth_autoread.indexOf('&') > -1){
+            YouthBodys = body.youth_autoread.split('&');
+            console.log(`您选择的是用"&"隔开\n`);
+          }else if(body.youth_autoread.indexOf('\n') > -1){
+            YouthBodys = body.youth_autoread.split('\n');
+            console.log(`您选择的是用"\n"隔开\n`);
+          }else{
+            YouthBodys = body.youth_autoread;
+          }
+          timebodyVal = body.autotime_zq;
+        });
+
+        // if (process.env.YOUTH_READ && process.env.YOUTH_READ.indexOf('&') > -1) {
+        //     YouthBodys = process.env.YOUTH_READ.split('&');
+        //     console.log(`您选择的是用"&"隔开\n`)
+        // } else if (process.env.YOUTH_READ && process.env.YOUTH_READ.indexOf('\n') > -1) {
+        //     YouthBodys = process.env.YOUTH_READ.split('\n');
+        //     console.log(`您选择的是用换行隔开\n`)
+        // } else {
+        //     YouthBodys = [process.env.YOUTH_READ]
+        // }
     } else if (!$.isNode() && YouthBody.indexOf("&") > -1) {
         YouthBodys = YouthBody.split("&")
     };
@@ -157,11 +179,11 @@ function AutoRead() {
                         }
                     }
                     if ($.index % 2 == 0) {
-                        if ($.isNode() && process.env.YOUTH_ATIME) {
-                            timebodyVal = process.env.YOUTH_ATIME;
-                        } else {
-                            timebodyVal = $.getdata('autotime_zq');
-                        }
+                        // if ($.isNode() && process.env.YOUTH_ATIME) {
+                        //     timebodyVal = process.env.YOUTH_ATIME;
+                        // } else {
+                        //     timebodyVal = $.getdata('autotime_zq');
+                        // }
                         await readTime()
                     };
                     if ($.index == ReadArr.length) {
