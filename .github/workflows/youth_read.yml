@@ -24,7 +24,6 @@ jobs:
           npm install
 
       - name: '运行 【中青看点自动阅读】'
-        if: env.YOUTH_READ
         run: |
           node Youth_Read.js
         # env:
