@@ -230,9 +230,13 @@ function batHost(api, body) {
     return {
         url: 'https://ios.baertt.com/v5/' + api,
         headers: {
-            'User-Agent': 'KDApp/2.0.2 (iPhone; iOS 14.5; Scale/3.00)',
-            'Host': 'ios.baertt.com',
-            'Content-Type': 'application/x-www-form-urlencoded'
+            "Accept": "*/*",
+            "Accept-Encoding": "gzip, deflate",
+            "Accept-Language": "en-us",
+            "Connection": "keep-alive",
+            "Content-Type": "application/x-www-form-urlencoded",
+            "Host": "ios.baertt.com",
+            "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 13_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148"
         },
         body: body
     }
