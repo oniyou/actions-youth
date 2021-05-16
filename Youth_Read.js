@@ -241,6 +241,7 @@ function batHost(api, body) {
 function readTime() {
     return new Promise((resolve, reject) => {
         $.post(batHost('user/stay.json', timebodyVal), (error, resp, data) => {
+            $.log('\ntimebodyVal: ' + timebodyVal + '\n')
             $.log(data)
             let timeres = JSON.parse(data)
             if (timeres.error_code == 0) {
