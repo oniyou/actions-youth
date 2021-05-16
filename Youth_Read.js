@@ -38,7 +38,7 @@ if (!$.isNode() && !YouthBody == true) {
         // console.log("同步读取: " + data.toString());
         // parse JSON object
         let bodys = JSON.parse(data.toString());
-        let len = bodys.length();
+        let len = bodys.length;
         console.log(`\nparse bodys success~~~~~~, bodys length is: ` + len);
         //
         for(x=0; x<len; x++) {
@@ -78,7 +78,7 @@ console.log(`\n === 脚本执行 ${bjTime} ===\n`);
 $.log("******** 您共获取" + ReadArr.length + "次阅读请求，任务开始 *******")
 
 !(async () => {
-    let len = Accounts.length();
+    let len = Accounts.length;
     if ($.isNode() && len>0) {
         for (j=0; j<len; j++) {
             ReadArr = Accounts[j];
