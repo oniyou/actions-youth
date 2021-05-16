@@ -11,7 +11,7 @@ Github Actions使用方法见[@lxk0301](https://raw.githubusercontent.com/lxk030
 const $ = new Env("中青看点阅读")
 //const notify = $.isNode() ? require('./sendNotify') : '';
 
-let ReadArr = [], timebodyVal = "";
+let Accounts = [], ReadArr = [], timebodyVal = "";
 let YouthBody = $.getdata('youth_autoread') || $.getdata("zqgetbody_body");
 let smallzq = $.getdata('youth_cut');
 let indexLast = $.getdata('zqbody_index');
@@ -33,49 +33,40 @@ if (!$.isNode() && !YouthBody == true) {
     ReadArr.push(YouthBody)
 } else {
     if ($.isNode()) {
-        // read JSON object from file
-        // $.fs.readFile('zq_body.json', 'utf-8', (err, data) => {
-        //     if (err) {
-        //         throw err;
-        //     }
         // 同步读取
         let data = $.fs.readFileSync('zq_body.json');
         // console.log("同步读取: " + data.toString());
         // parse JSON object
-        let body = JSON.parse(data.toString());
-        // print JSON object
-        console.log(`parse body success~~~~~~`);
-        if (body.youth_autoread.indexOf('&') > -1) {
-            YouthBodys = body.youth_autoread.split('&');
-            console.log(`您选择的是用"&"隔开\n`);
-        } else if (body.youth_autoread.indexOf('\n') > -1) {
-            YouthBodys = body.youth_autoread.split('\n');
-            console.log(`您选择的是用"\n"隔开\n`);
-        } else {
-            YouthBodys = body.youth_autoread;
+        let bodys = JSON.parse(data.toString());
+        let len = bodys.length();
+        console.log(`\nparse bodys success~~~~~~, bodys length is: ` + len);
+        //
+        for(x=0; x<len; x++) {
+            if (bodys[x].youth_autoread.indexOf('&') > -1) {
+                YouthBodys = bodys[x].youth_autoread.split('&');
+                console.log(`您选择的是用"&"隔开\n`);
+            } else if (bodys[x].youth_autoread.indexOf('\n') > -1) {
+                YouthBodys = bodys[x].youth_autoread.split('\n');
+                console.log(`您选择的是用"\n"隔开\n`);
+            } else {
+                YouthBodys = bodys[x].youth_autoread;
+            }
+           // timebodyVal = body.autotime_zq;
+            //
+            ReadArr = [];
+            Object.keys(YouthBodys).forEach((item) => {
+                if (YouthBodys[item]) {
+                    ReadArr.push(YouthBodys[item])
+                }
+            })
+            console.log(`\n账号${x+1}的body长度为：` + ReadArr.length);
+            Accounts.push(ReadArr)
         }
-        timebodyVal = body.autotime_zq;
-        //   console.log(body.autotime_zq);
-        // })
-
-        // if (process.env.YOUTH_READ && process.env.YOUTH_READ.indexOf('&') > -1) {
-        //     YouthBodys = process.env.YOUTH_READ.split('&');
-        //     console.log(`您选择的是用"&"隔开\n`)
-        // } else if (process.env.YOUTH_READ && process.env.YOUTH_READ.indexOf('\n') > -1) {
-        //     YouthBodys = process.env.YOUTH_READ.split('\n');
-        //     console.log(`您选择的是用换行隔开\n`)
-        // } else {
-        //     YouthBodys = [process.env.YOUTH_READ]
-        // }
+        
     } else if (!$.isNode() && YouthBody.indexOf("&") > -1) {
         YouthBodys = YouthBody.split("&")
     }
-    Object.keys(YouthBodys).forEach((item) => {
-        if (YouthBodys[item]) {
-            ReadArr.push(YouthBodys[item])
-        }
-    })
-    console.log(ReadArr.length)
+    
 }
 timeZone = new Date().getTimezoneOffset() / 60;
 timestamp = Date.now() + (8 + timeZone) * 60 * 60 * 1000;
@@ -87,42 +78,64 @@ console.log(`\n === 脚本执行 ${bjTime} ===\n`);
 $.log("******** 您共获取" + ReadArr.length + "次阅读请求，任务开始 *******")
 
 !(async () => {
-    if (!ReadArr[0]) {
-        console.log($.name, '【提示】请把抓包的请求体填入Github 的 Secrets 中，请以&隔开')
-        return;
-    }
-    if (!$.isNode()) {
-        $.begin = indexLast ? parseInt(indexLast) : 1;
-        if ($.begin + 1 < ReadArr.length) {
-            $.log("\n上次运行到第" + $.begin + "次终止，本次从" + (parseInt($.begin) + 1) + "次开始");
+    let len = Accounts.length();
+    if ($.isNode() && len>0) {
+        for (j=0; j<len; j++) {
+            ReadArr = Accounts[j];
+            indexLast = 0, $.begin = 0, $.index = 0;
+            for (var i = indexLast ? indexLast : 0; i < ReadArr.length; i++) {
+                if (ReadArr[i]) {
+                    articlebody = ReadArr[i];
+                    $.index = $.index + 1;
+                    $.log(`-------------------------\n账号${j+1}开始中青看点第${$.index}次阅读\n`);
+                    await bodyInfo();
+                }
+            };
+            $.log("\n……………………………………………………………………\n\n本次共删除" + delbody + "个请求，剩余" + (ReadArr.length - delbody) + "个请求");
+            $.log("本次共阅读" + artsnum + "次资讯，共获得" + readscore + "青豆\n观看" + videosnum + "次视频，获得" + videoscore + "青豆(不含0青豆次数)\n");
+            console.log(`-------------------------\n\n中青看点共完成${$.index}次阅读，共计获得${readscore + videoscore}个青豆，阅读请求全部结束`);
+            $.msg($.name, `本次运行共完成${$.index}次阅读，共计获得${readscore + videoscore}个青豆`, "删除" + delbody + "个请求" + (readtimes ? "，阅读时长" + parseInt(readtimes) + "分钟" : ""))
+            }
+        }
+    } else {
+        if (!ReadArr[0]) {
+            console.log($.name, '【提示】请把抓包的请求体填入Github 的 Secrets 中，请以&隔开')
+            return;
+        }
+        if (!$.isNode()) {
+            $.begin = indexLast ? parseInt(indexLast) : 1;
+            if ($.begin + 1 < ReadArr.length) {
+                $.log("\n上次运行到第" + $.begin + "次终止，本次从" + (parseInt($.begin) + 1) + "次开始");
+            } else {
+                $.log("由于上次缩减剩余请求数已小于总请求数，本次从头开始");
+                indexLast = 0,
+                    $.begin = 0
+            }
         } else {
-            $.log("由于上次缩减剩余请求数已小于总请求数，本次从头开始");
             indexLast = 0,
                 $.begin = 0
         }
-    } else {
-        indexLast = 0,
-            $.begin = 0
-    }
-    if (smallzq == "true") {
-        $.log("     请注意缩减请求开关已打开‼️\n     如不需要    请强制停止\n     关闭Boxjs缩减请求开关")
-    };
-    $.index = 0;
-    for (var i = indexLast ? indexLast : 0; i < ReadArr.length; i++) {
-        if (ReadArr[i]) {
-            articlebody = ReadArr[i];
-            $.index = $.index + 1;
-            $.log(`-------------------------\n开始中青看点第${$.index}次阅读\n`);
-            await bodyInfo();
+        if (smallzq == "true") {
+            $.log("     请注意缩减请求开关已打开‼️\n     如不需要    请强制停止\n     关闭Boxjs缩减请求开关")
+        };
+        $.index = 0;
+        for (var i = indexLast ? indexLast : 0; i < ReadArr.length; i++) {
+            if (ReadArr[i]) {
+                articlebody = ReadArr[i];
+                $.index = $.index + 1;
+                $.log(`-------------------------\n开始中青看点第${$.index}次阅读\n`);
+                await bodyInfo();
+            }
+        };
+        $.log("\n……………………………………………………………………\n\n本次共删除" + delbody + "个请求，剩余" + (ReadArr.length - delbody) + "个请求");
+        $.log("本次共阅读" + artsnum + "次资讯，共获得" + readscore + "青豆\n观看" + videosnum + "次视频，获得" + videoscore + "青豆(不含0青豆次数)\n");
+        console.log(`-------------------------\n\n中青看点共完成${$.index}次阅读，共计获得${readscore + videoscore}个青豆，阅读请求全部结束`);
+        $.msg($.name, `本次运行共完成${$.index}次阅读，共计获得${readscore + videoscore}个青豆`, "删除" + delbody + "个请求" + (readtimes ? "，阅读时长" + parseInt(readtimes) + "分钟" : ""))
         }
-    };
-    $.log("\n……………………………………………………………………\n\n本次共删除" + delbody + "个请求，剩余" + (ReadArr.length - delbody) + "个请求");
-    $.log("本次共阅读" + artsnum + "次资讯，共获得" + readscore + "青豆\n观看" + videosnum + "次视频，获得" + videoscore + "青豆(不含0青豆次数)\n");
-    console.log(`-------------------------\n\n中青看点共完成${$.index}次阅读，共计获得${readscore + videoscore}个青豆，阅读请求全部结束`);
-    $.msg($.name, `本次运行共完成${$.index}次阅读，共计获得${readscore + videoscore}个青豆`, "删除" + delbody + "个请求" + (readtimes ? "，阅读时长" + parseInt(readtimes) + "分钟" : ""))
 })()
     .catch((e) => $.logErr(e))
     .finally(() => $.done())
+
 
 function bodyInfo() {
     return new Promise((resolve, reject) => {
