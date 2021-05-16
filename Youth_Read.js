@@ -18,6 +18,7 @@ let indexLast = $.getdata('zqbody_index');
 let artsnum = 0, videosnum = 0;
 let videoscore = 0, readscore = 0;
 let artArr = [], delbody = 0;
+let readtimes = 0;  //阅读时长
 if (isGetbody = typeof $request !== `undefined`) {
     Getbody();
     $done()
