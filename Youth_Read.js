@@ -63,7 +63,7 @@ if (!$.isNode() && !YouthBody == true) {
             console.log(`\n账号${x+1}的body长度为：` + ReadArr.length);
             Accounts.push(ReadArr)
         }
-        
+        Accounts.reverse()
     } else if (!$.isNode() && YouthBody.indexOf("&") > -1) {
         YouthBodys = YouthBody.split("&")
     }
